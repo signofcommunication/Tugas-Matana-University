@@ -8,7 +8,7 @@ int main(void) {
 	cout << "Input Second Number : ";
 	cin >> b;
 	
-	for(int n = a; n <= b; n++) {
+	for(int n = a; n <= b; n++) { 
 		res += n;
 	}
 	cout << res;
