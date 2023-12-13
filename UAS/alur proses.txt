@@ -1,0 +1,70 @@
+kerjain big picture nya terlebih dahulu dengan data static dan mockup
+
+1. Siapkan beberapa variabel harga untuk obat beserta harganya
+2. Input kode obat sesuai di resep dan jumlah yang mau diambil
+3. Tanyakan apakah masih mau beli obat atau tidak
+4. Jika iya lanjutkan seperti sebelumnya
+5. Jika tidak lanjutkan ke menu pembayaran
+
+Steps
+- Coba pake files dulu sampe berhasil
+- Coba pake database
+
+
+Proses pemecahan kasus
+1. User melihat resep-resep obat
+2. User minta obat tertentu dan memberikan jumlah obatnya
+3. Admin melihat stok barang dan memberi tahu jika ada barang atau tidak
+4. Jika stok tidak ada sistem akan memberi tahu bahwa stok habis
+5. Jika stok barang ada maka akan melanjutkan ke menu pembayaran
+6. Jika barang tersedia tampilkan total harga yang harus dibayarkan
+7. User Memasukan uang pembayaran
+8. Tampilkan kembalian dan status pembayaran berhasil atau gagal
+
+Kondisi
+gagal -> Jika uang dimasukan lebih kecil daripada harga yang ditentukan
+bagaimana jika user membeli obat yang berbeda.
+
+Syarat
+- Menggunakan Array
+- Harus menggunakan Files (Jika menggunakan database dapat memperoleh nilai bonus)
+- Improvisasi kode
+
+- stok harus dari file text
+
+- kan stok angka itu ada di akhir string berarti cari algoritma mendapatkan karakter terakhir dari sebuh string dan buat function buat mengisolasi algoritma itu sendiri
+- lalu simpan nilai di variabel
+
+
+- convert string to integer
+
+
+//#include <iostream>
+//#include <fstream>
+//#include <string>
+//using namespace std;
+//
+//int main() {
+//	ifstream file_("data.txt");
+//	int counter;
+//	int STOK_PANADOL,STOK_BODREX,STOK_BANDEX;
+//	string name;
+//	
+//	if(file_.is_open()){
+//		while(file_ >> name >> counter) {
+//			STOK_PANADOL = counter;
+//			STOK_BODREX = counter;
+//			STOK_BANDEX	= counter;	
+//			cout << counter;
+//		}
+//		cout << STOK_PANADOL << " " << STOK_BODREX << " " << STOK_BANDEX;
+//		file_.close();
+//	} else {
+//		cout << "File is not open" << endl;
+//	}
+//	cin.get();
+//	
+//	cout << STOK_PANADOL << " " << STOK_BODREX << " " << STOK_BANDEX;
+//	
+//	return 0;
+//}
