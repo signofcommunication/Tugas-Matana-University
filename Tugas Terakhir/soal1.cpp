@@ -4,17 +4,14 @@
 
 using namespace std;
 
-int main() {
-    // Open the input file
+int main() 
     ifstream inputFile("game_data.txt");
 
-    // Check if the file is opened successfully
     if (!inputFile.is_open()) {
         cerr << "Error opening the file!" << endl;
         return 1;
     }
 
-    // Read the content of the file into a vector of strings
     vector<string> mapData;
     string line;
 
@@ -42,7 +39,6 @@ int main() {
         }
     }
 
-    // If the bomb is not found
     cout << "Bomb not found in the map." << endl;
 
     return 0;
