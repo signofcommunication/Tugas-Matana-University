@@ -6,6 +6,9 @@
 #include <vector>
 using namespace std;
 
+vector<vector<pair<string, int>>> arrayOfArrays;
+vector<pair<string, int>> innerArray;
+
 string lastWord(const string& text) {
 	int i = text.length() - 1;
 	
@@ -124,6 +127,20 @@ int edit(int line_number,string text) {
   return 0;
 }
 
+void appendArray(string nama_obat,int jumlah_obat) {
+    pair<string, int> userPair = make_pair(nama_obat, jumlah_obat);
+
+    innerArray.push_back(userPair);
+
+    arrayOfArrays.push_back(innerArray);
+
+    for (const auto& innerVector : arrayOfArrays) {
+        for (const auto& element : innerVector) {
+            cout << "String: " << element.first << ", Integer: " << element.second << endl;
+        }
+    }
+}
+
 int main() {
 	cout << "====================================" << endl;
 	cout << "|  NO  |  Obat  |  Stok  |  Harga  |" << endl;
@@ -138,6 +155,7 @@ int main() {
 	int TOTAL_PEMBAYARAN = 0,KEMBALIAN,UANG_PEMBAYARAN;
 	int kode_obat,jumlah_obat;
 	bool state = true;
+	int pilihan;
 	
 	while(state) {
 		cout << "Masukan Nama Kode Obat : ";
@@ -150,25 +168,20 @@ int main() {
 				if(STOK_PANADOL == 0) {
 					cout << "Stok Obat Panadol habis!";
 					return 1;
-				} else if(STOK_PANADOL < jumlah_obat) {
-					cout << "Stok obat panadol tersisa " << STOK_PANADOL << ", pesan lagi!" << endl;
-					cin >> jumlah_obat;
 				}
 				
 				TOTAL_PEMBAYARAN = PANADOL * jumlah_obat;
 				STOK_PANADOL = STOK_PANADOL - jumlah_obat;
 				string stok_baru = to_string(STOK_PANADOL);
 				string text_obat = "STOK_PANADOL " + stok_baru;
-				edit(1,text_obat);	
+				edit(1,text_obat);
+				appendArray("Panadol",jumlah_obat);
 			}
 			break;
 			case 2:{
 				if(STOK_BODREX == 0) {
 					cout << "Stok Obat Bodrex habis!";
 					return 1;
-				} else if(STOK_BODREX < jumlah_obat) {
-					cout << "Stok obat bodrex tersisa " << STOK_BODREX << ", pesan lagi!" << endl;
-					cin >> jumlah_obat;
 				}
 					
 				TOTAL_PEMBAYARAN = BODREX * jumlah_obat;
@@ -176,24 +189,27 @@ int main() {
 				string stok_baru_2 = to_string(STOK_BODREX);
 				string text_obat_2 = "STOK_BODREX " + stok_baru_2;
 				edit(2,text_obat_2);	
+				appendArray("Bodrex",jumlah_obat);
 			}
 			break;
 			case 3: {
 				if(STOK_ANTIMO == 0) {
 					cout << "Stok Obat Antimo habis!";
 					return 1;
-				} else if(STOK_ANTIMO < jumlah_obat) {
-					cout << "Stok obat antimo " << STOK_ANTIMO << ", pesan lagi!" << endl;
-					cin >> jumlah_obat;
 				}
 				
 				TOTAL_PEMBAYARAN = ANTIMO * jumlah_obat;
 				STOK_ANTIMO = STOK_ANTIMO - jumlah_obat;
 				string stok_baru_3 = to_string(STOK_ANTIMO);
 				string text_obat_3 = "STOK_ANTIMO " + stok_baru_3;
-				edit(3,text_obat_3);	
+				edit(3,text_obat_3);
+				appendArray("Antimo",jumlah_obat);	
 			}
 			break;
+			default: 
+				cout << "Tidak ada opsi " << kode_obat << " ngentot! Pilih kode yang lain lagi!!" << endl;
+				continue;
+			
 		}
 		
 		cout << "Masukan uang pembayaran : ";
@@ -207,9 +223,18 @@ int main() {
 		}
 		
 		cout << "Kembalian : Rp."<< UANG_PEMBAYARAN - TOTAL_PEMBAYARAN << endl;
-		cout << "STATUS : Pembayaran BERHASIL!!";
+		cout << "STATUS : Pembayaran BERHASIL!!" << endl;
 		
-		state = false;
+		// Show History right here
+		
+		cout << "Apakah mau belanja lagi??(1: Iya, 0: Tidak): ";
+		cin >> pilihan;
+		
+		if(pilihan == 1) {
+			continue;
+		} else {
+			state = false;
+		}
 	}
 	
 	return 0;
