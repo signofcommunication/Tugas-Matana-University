@@ -29,42 +29,13 @@ Syarat
 - Menggunakan Array
 - Harus menggunakan Files (Jika menggunakan database dapat memperoleh nilai bonus)
 - Improvisasi kode
-
 - stok harus dari file text
 
 - kan stok angka itu ada di akhir string berarti cari algoritma mendapatkan karakter terakhir dari sebuh string dan buat function buat mengisolasi algoritma itu sendiri
 - lalu simpan nilai di variabel
-
+- update data integer stok ketika barang dibeli.
+- perbaiki error ketika edit function dipanggil seharusnya value "STOK_OBAT 50" bukan hanya angka stok saja(50)
 
 - convert string to integer
-
-
-//#include <iostream>
-//#include <fstream>
-//#include <string>
-//using namespace std;
-//
-//int main() {
-//	ifstream file_("data.txt");
-//	int counter;
-//	int STOK_PANADOL,STOK_BODREX,STOK_BANDEX;
-//	string name;
-//	
-//	if(file_.is_open()){
-//		while(file_ >> name >> counter) {
-//			STOK_PANADOL = counter;
-//			STOK_BODREX = counter;
-//			STOK_BANDEX	= counter;	
-//			cout << counter;
-//		}
-//		cout << STOK_PANADOL << " " << STOK_BODREX << " " << STOK_BANDEX;
-//		file_.close();
-//	} else {
-//		cout << "File is not open" << endl;
-//	}
-//	cin.get();
-//	
-//	cout << STOK_PANADOL << " " << STOK_BODREX << " " << STOK_BANDEX;
-//	
-//	return 0;
-//}
+- Array buat history penjualan yang terdiri dari nama obat yang dibeli,jumlah obat yang dibeli -> append ketika setelah dibeli -> show history penjualan 
+- tampilkan history

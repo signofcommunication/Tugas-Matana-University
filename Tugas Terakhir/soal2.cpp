@@ -32,10 +32,6 @@ int main() {
                 cout << word << endl;
             }
         }
-
-        if (!hasCapitalLetter(line)) {
-            break;
-        }
     }
 
     inputFile.close();
