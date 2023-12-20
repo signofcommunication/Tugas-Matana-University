@@ -133,12 +133,6 @@ void appendArray(string nama_obat,int jumlah_obat) {
     innerArray.push_back(userPair);
 
     arrayOfArrays.push_back(innerArray);
-
-    for (const auto& innerVector : arrayOfArrays) {
-        for (const auto& element : innerVector) {
-            cout << "String: " << element.first << ", Integer: " << element.second << endl;
-        }
-    }
 }
 
 int main() {
@@ -207,7 +201,7 @@ int main() {
 			}
 			break;
 			default: 
-				cout << "Tidak ada opsi " << kode_obat << " ngentot! Pilih kode yang lain lagi!!" << endl;
+				cout << "Tidak ada opsi " << kode_obat << "! Pilih kode yang lain lagi!!" << endl;
 				continue;
 			
 		}
@@ -225,8 +219,6 @@ int main() {
 		cout << "Kembalian : Rp."<< UANG_PEMBAYARAN - TOTAL_PEMBAYARAN << endl;
 		cout << "STATUS : Pembayaran BERHASIL!!" << endl;
 		
-		// Show History right here
-		
 		cout << "Apakah mau belanja lagi??(1: Iya, 0: Tidak): ";
 		cin >> pilihan;
 		
@@ -234,6 +226,7 @@ int main() {
 			continue;
 		} else {
 			state = false;
+			cout << "Terimakasih Sudah Berbelanja disini!"<< endl;
 		}
 	}
 	
