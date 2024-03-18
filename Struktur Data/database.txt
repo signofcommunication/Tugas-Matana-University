@@ -1,0 +1,5 @@
+1,"Jonathan Doe","Teknik Industri",21,4.00
+2,"Jane Smith","Teknik Informatika",22,3.8
+3,Jane Doe,"Teknik Kimia",44,3.90
+4,"Emily Davis","Teknik Informatika",23,3.7
+5,"Michael Wilson","Teknik Informatika",22,3.5
