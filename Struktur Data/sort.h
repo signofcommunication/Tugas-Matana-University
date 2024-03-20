@@ -35,8 +35,8 @@ bool compareByNama(const Mahasiswa& a, const Mahasiswa& b) {
 // Fungsi untuk memuat data dari file
 // Fungsi untuk memuat data dari file
 vector<Mahasiswa> loadMahasiswa(const string& filename) {
-	vector<Mahasiswa> mahasiswas;
-	ifstream file(filename);
+    vector<Mahasiswa> mahasiswas;
+    ifstream file(filename);
     if (file.is_open()) {
         string line;
         while (getline(file, line)) {
@@ -85,10 +85,8 @@ void displayMahasiswa(const vector<Mahasiswa>& mahasiswas) {
     }
 }
 
-int main() {
-    string filename = "database.txt";
+void sortData(string filename) {
     vector<Mahasiswa> mahasiswas = loadMahasiswa(filename);
     sort(mahasiswas.begin(), mahasiswas.end(), compareByNama);
     displayMahasiswa(mahasiswas);
-    return 0;
 }
