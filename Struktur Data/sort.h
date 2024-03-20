@@ -4,12 +4,13 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+using namespace std;
 
 // Struktur data untuk menyimpan informasi mahasiswa
 struct Mahasiswa {
     int id;
-    std::string nama;
-    std::string jurusan;
+    string nama;
+    string jurusan;
     int usia;
     double ipk;
 };
@@ -18,8 +19,8 @@ struct Mahasiswa {
 // Fungsi untuk membandingkan dua mahasiswa berdasarkan nama (untuk digunakan dalam sort)
 bool compareByNama(const Mahasiswa& a, const Mahasiswa& b) {
     // Mengambil inisial dari nama
-    char initialA = std::toupper(a.nama[0]);
-    char initialB = std::toupper(b.nama[0]);
+    char initialA = toupper(a.nama[0]);
+    char initialB = toupper(b.nama[0]);
     
     // Jika inisial sama, bandingkan nama secara lengkap
     if (initialA == initialB) {
@@ -33,30 +34,30 @@ bool compareByNama(const Mahasiswa& a, const Mahasiswa& b) {
 
 // Fungsi untuk memuat data dari file
 // Fungsi untuk memuat data dari file
-std::vector<Mahasiswa> loadMahasiswa(const std::string& filename) {
-    std::vector<Mahasiswa> mahasiswas;
-    std::ifstream file(filename);
+vector<Mahasiswa> loadMahasiswa(const string& filename) {
+	vector<Mahasiswa> mahasiswas;
+	ifstream file(filename);
     if (file.is_open()) {
-        std::string line;
-        while (std::getline(file, line)) {
-            std::istringstream iss(line);
-            std::string token;
+        string line;
+        while (getline(file, line)) {
+            istringstream iss(line);
+            string token;
             Mahasiswa mahasiswa;
             int tokenCount = 0;
-            while (std::getline(iss, token, ',')) {
+            while (getline(iss, token, ',')) {
                 tokenCount++;
-                std::istringstream tokenStream(token);
+                istringstream tokenStream(token);
                 switch (tokenCount) {
                     case 1:
                         tokenStream >> mahasiswa.id;
                         break;
                     case 2:
-                        std::getline(tokenStream, mahasiswa.nama, '"');
-                        std::getline(tokenStream, mahasiswa.nama, '"');
+                        getline(tokenStream, mahasiswa.nama, '"');
+                        getline(tokenStream, mahasiswa.nama, '"');
                         break;
                     case 3:
-                        std::getline(tokenStream, mahasiswa.jurusan, '"');
-                        std::getline(tokenStream, mahasiswa.jurusan, '"');
+                        getline(tokenStream, mahasiswa.jurusan, '"');
+                        getline(tokenStream, mahasiswa.jurusan, '"');
                         break;
                     case 4:
                         tokenStream >> mahasiswa.usia;
@@ -70,24 +71,24 @@ std::vector<Mahasiswa> loadMahasiswa(const std::string& filename) {
         }
         file.close();
     } else {
-        std::cerr << "Gagal membuka file: " << filename << std::endl;
+        cerr << "Gagal membuka file: " << filename << endl;
     }
     return mahasiswas;
 }
 
 
 // Fungsi untuk menampilkan data mahasiswa
-void displayMahasiswa(const std::vector<Mahasiswa>& mahasiswas) {
+void displayMahasiswa(const vector<Mahasiswa>& mahasiswas) {
     for (const auto& mahasiswa : mahasiswas) {
-        std::cout << "ID: " << mahasiswa.id << ", Nama: " << mahasiswa.nama << ", Jurusan: " << mahasiswa.jurusan
-                  << ", Usia: " << mahasiswa.usia << ", IPK: " << mahasiswa.ipk << std::endl;
+        cout << "ID: " << mahasiswa.id << ", Nama: " << mahasiswa.nama << ", Jurusan: " << mahasiswa.jurusan
+                  << ", Usia: " << mahasiswa.usia << ", IPK: " << mahasiswa.ipk << endl;
     }
 }
 
-void sortData(string filename) {
-//    std::string filename = "database.txt";
-    std::vector<Mahasiswa> mahasiswas = loadMahasiswa(filename);
-    std::sort(mahasiswas.begin(), mahasiswas.end(), compareByNama);
+int main() {
+    string filename = "database.txt";
+    vector<Mahasiswa> mahasiswas = loadMahasiswa(filename);
+    sort(mahasiswas.begin(), mahasiswas.end(), compareByNama);
     displayMahasiswa(mahasiswas);
+    return 0;
 }
-
