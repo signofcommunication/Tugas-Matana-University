@@ -1,0 +1,9 @@
+id,name,phone,email
+5,dendi,90887723819,dendi@gmail.com
+6,Fridolf,081250092992,fridolf@gmail.com
+7,Michael,0899999999,mikel@gmail.com
+8,holan,0812345678910,holan@matana.ac.id
+10,test1,23123123,932923
+11,fridolf,23312321,412312312
+13,nuel,081233224421,nuel@gmail.com
+14,ericko,098881231923,ericko@gmail.com
