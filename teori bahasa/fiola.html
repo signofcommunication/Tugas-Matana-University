@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualisasi DFA Validasi Email</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .input-section {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .input-section label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .input-section input {
+      padding: 8px;
+      width: 300px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .input-section button {
+      padding: 8px 16px;
+      margin: 0 5px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .input-section button:hover {
+      background-color: #0056b3;
+    }
+    .input-section #resetBtn {
+      background-color: #dc3545;
+    }
+    .input-section #resetBtn:hover {
+      background-color: #c82333;
+    }
+    .result {
+      margin: 20px 0;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .result.valid {
+      color: #28a745;
+    }
+    .result.invalid {
+      color: #dc3545;
+    }
+    @media (max-width: 768px) {
+      .input-section input {
+        width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Visualisasi DFA untuk Validasi Email</h1>
+    
+    <div class="input-section">
+      <label for="emailInput">Masukkan Email:</label><br>
+      <input type="text" id="emailInput" placeholder="contoh: john.doe@matanauniversity.ac.id"><br>
+      <button onclick="validateEmail()">Validasi Email</button>
+      <button id="resetBtn" onclick="reset()">Reset</button>
+    </div>
+    <div class="result" id="emailResult"></div>
+  </div>
+
+  <script>
+    function validateEmail() {
+      const input = document.getElementById('emailInput').value;
+      const resultDiv = document.getElementById('emailResult');
+      let currentState = 'q0';
+      
+      for (let i = 0; i < input.length; i++) {
+        const char = input[i];
+        let nextState = 'q_error';
+        
+        switch (currentState) {
+          case 'q0':
+            if (/[a-zA-Z]/.test(char)) nextState = 'q1';
+            break;
+          case 'q1':
+            if (/[a-zA-Z]/.test(char)) nextState = 'q1';
+            else if (char === '.') nextState = 'q2';
+            break;
+          case 'q2':
+            if (/[a-zA-Z]/.test(char)) nextState = 'q3';
+            break;
+          case 'q3':
+            if (/[a-zA-Z]/.test(char)) nextState = 'q3';
+            else if (char === '@') nextState = 'q4';
+            break;
+          case 'q4':
+            if (char === 'm') nextState = 'q5';
+            break;
+          case 'q5':
+            if (char === 'a') nextState = 'q6';
+            break;
+          case 'q6':
+            if (char === 't') nextState = 'q7';
+            break;
+          case 'q7':
+            if (char === 'a') nextState = 'q8';
+            break;
+          case 'q8':
+            if (char === 'n') nextState = 'q9';
+            break;
+          case 'q9':
+            if (char === 'a') nextState = 'q10';
+            break;
+          case 'q10':
+            if (char === 'u') nextState = 'q11';
+            break;
+          case 'q11':
+            if (char === 'n') nextState = 'q12';
+            break;
+          case 'q12':
+            if (char === 'i') nextState = 'q13';
+            break;
+          case 'q13':
+            if (char === 'v') nextState = 'q14';
+            break;
+          case 'q14':
+            if (char === 'e') nextState = 'q15';
+            break;
+          case 'q15':
+            if (char === 'r') nextState = 'q16';
+            break;
+          case 'q16':
+            if (char === 's') nextState = 'q17';
+            break;
+          case 'q17':
+            if (char === 'i') nextState = 'q18';
+            break;
+          case 'q18':
+            if (char === 't') nextState = 'q19';
+            break;
+          case 'q19':
+            if (char === 'y') nextState = 'q20';
+            break;
+          case 'q20':
+            if (char === '.') nextState = 'q21';
+            break;
+          case 'q21':
+            if (char === 'a') nextState = 'q22';
+            break;
+          case 'q22':
+            if (char === 'c') nextState = 'q23';
+            break;
+          case 'q23':
+            if (char === '.') nextState = 'q24';
+            break;
+          case 'q24':
+            if (char === 'i') nextState = 'q25';
+            break;
+          case 'q25':
+            if (char === 'd') nextState = 'q26';
+            break;
+          case 'q26':
+            break;
+          case 'q_error':
+            nextState = 'q_error';
+            break;
+        }
+
+        currentState = nextState;
+      }
+
+      if (currentState === 'q26') {
+        resultDiv.textContent = `Email valid: ${input}`;
+        resultDiv.className = 'result valid';
+      } else {
+        resultDiv.textContent = `Email tidak valid: ${input}`;
+        resultDiv.className = 'result invalid';
+      }
+    }
+
+    function reset() {
+      document.getElementById('emailInput').value = '';
+      document.getElementById('emailResult').textContent = '';
+      document.getElementById('emailResult').className = 'result';
+    }
+  </script>
+</body>
+</html>
