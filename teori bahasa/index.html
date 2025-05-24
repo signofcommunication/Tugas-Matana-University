@@ -1,1 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Sistem Pengapian Mesin Motor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        select, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #inputList {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        #output {
+            margin-top: 20px;
+            text-align: left;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+        #history {
+            margin-top: 20px;
+            text-align: left;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simulasi DFA Sistem Pengapian Mesin Motor</h1>
+        <p>Pilih input untuk mensimulasikan keadaan mesin motor:</p>
+        <select id="inputSelect">
+            <option value="Start">Start</option>
+            <option value="Gas">Gas</option>
+            <option value="Stop">Stop</option>
+        </select>
+        <button onclick="addInput()">Tambah Input</button>
+        <button onclick="runSimulation()">Jalankan Simulasi</button>
+        <button onclick="loadHistory()">Muat History</button>
+        <div id="inputList">Urutan input: []</div>
+        <div id="output">Hasil simulasi akan muncul di sini...</div>
+        <div id="history">
+            <h3>History Simulasi</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Waktu</th>
+                        <th>Urutan Input</th>
+                        <th>State Akhir</th>
+                        <th>Diterima</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable"></tbody>
+            </table>
+        </div>
+    </div>
 
+    <script>
+        const dfa = {
+            states: ['Mati', 'Idle', 'Berjalan'],
+            inputs: ['Start', 'Gas', 'Stop'],
+            initialState: 'Mati',
+            finalStates: ['Mati'],
+            transitions: {
+                'Mati': { 'Start': 'Idle' },
+                'Idle': { 'Gas': 'Berjalan', 'Stop': 'Mati' },
+                'Berjalan': { 'Stop': 'Mati' }
+            }
+        };
+
+        let inputSequence = [];
+
+        // Fungsi untuk menambah input ke urutan
+        function addInput() {
+            const select = document.getElementById('inputSelect');
+            const input = select.value;
+            inputSequence.push(input);
+            document.getElementById('inputList').innerText = `Urutan input: [${inputSequence.join(', ')}]`;
+        }
+
+        // Fungsi untuk menjalankan simulasi DFA
+        async function runSimulation() {
+            let currentState = dfa.initialState;
+            let output = `State awal: ${currentState}<br>`;
+            let isValid = true;
+
+            for (let input of inputSequence) {
+                if (dfa.transitions[currentState] && dfa.transitions[currentState][input]) {
+                    currentState = dfa.transitions[currentState][input];
+                    output += `Input: ${input} -> Transisi ke state: ${currentState}<br>`;
+                } else {
+                    output += `Input: ${input} -> Tidak valid untuk state ${currentState}!<br>`;
+                    isValid = false;
+                    break;
+                }
+            }
+
+            const isAccepted = dfa.finalStates.includes(currentState);
+            output += `State akhir: ${currentState}<br>`;
+            output += `Diterima? ${isAccepted ? 'Ya' : 'Tidak'}`;
+            document.getElementById('output').innerHTML = output;
+
+            // Simpan simulasi ke database
+            try {
+                const response = await fetch('http://localhost:3000/api/simulation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        input_sequence: inputSequence.join(','),
+                        final_state: currentState,
+                        is_accepted: isAccepted
+                    })
+                });
+                if (response.ok) {
+                    console.log('Simulasi disimpan');
+                    loadHistory(); // Perbarui history setelah menyimpan
+                } else {
+                    console.error('Gagal menyimpan simulasi');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+            }
+
+            // Reset input setelah simulasi
+            inputSequence = [];
+            document.getElementById('inputList').innerText = `Urutan input: []`;
+        }
+
+        // Fungsi untuk memuat history simulasi
+        async function loadHistory() {
+            try {
+                const response = await fetch('http://localhost:3000/api/simulation/history');
+                const history = await response.json();
+                const tbody = document.getElementById('historyTable');
+                tbody.innerHTML = '';
+                history.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${new Date(item.created_at).toLocaleString()}</td>
+                        <td>${item.input_sequence}</td>
+                        <td>${item.final_state}</td>
+                        <td>${item.is_accepted ? 'Ya' : 'Tidak'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Error memuat history:', err);
+                document.getElementById('historyTable').innerHTML = '<tr><td colspan="4">Gagal memuat history</td></tr>';
+            }
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>
