@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visualisasi DFA Validasi Email</title>
+  <title>Visualisasi DFA Validasi Email dan Password</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -55,6 +55,19 @@
     .input-section #resetBtn:hover {
       background-color: #c82333;
     }
+    .password-meter {
+      width: 300px;
+      height: 10px;
+      background-color: #ddd;
+      border-radius: 5px;
+      margin: 10px auto;
+      overflow: hidden;
+    }
+    .password-meter-bar {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
     .result {
       margin: 20px 0;
       text-align: center;
@@ -71,12 +84,15 @@
       .input-section input {
         width: 200px;
       }
+      .password-meter {
+        width: 200px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Visualisasi DFA untuk Validasi Email</h1>
+    <h1>Visualisasi DFA untuk Validasi Email dan Password</h1>
     
     <div class="input-section">
       <label for="emailInput">Masukkan Email:</label><br>
@@ -85,9 +101,21 @@
       <button id="resetBtn" onclick="reset()">Reset</button>
     </div>
     <div class="result" id="emailResult"></div>
+
+    <div class="input-section">
+      <label for="passwordInput">Masukkan Password:</label><br>
+      <input type="password" id="passwordInput" placeholder="contoh: Pass123!" oninput="updatePasswordMeter()"><br>
+      <div class="password-meter">
+        <div class="password-meter-bar" id="passwordMeterBar"></div>
+      </div>
+      <button onclick="validatePassword()">Validasi Password</button>
+      <button onclick="togglePassword()">Show Password</button>
+    </div>
+    <div class="result" id="passwordResult"></div>
   </div>
 
   <script>
+    // Validasi Email (dipertahankan dari kode asli)
     function validateEmail() {
       const input = document.getElementById('emailInput').value;
       const resultDiv = document.getElementById('emailResult');
@@ -197,10 +225,128 @@
       }
     }
 
+    // Validasi Password
+    function validatePassword() {
+      const input = document.getElementById('passwordInput').value;
+      const resultDiv = document.getElementById('passwordResult');
+      let currentState = 'q0';
+      let hasLower = false;
+      let hasUpper = false;
+      let hasDigit = false;
+      let hasSymbol = false;
+
+      for (let i = 0; i < input.length; i++) {
+        const char = input[i];
+        let nextState = 'q_error';
+
+        switch (currentState) {
+          case 'q0':
+            if (/[a-z]/.test(char)) {
+              nextState = 'q1';
+              hasLower = true;
+            } else if (/[A-Z]/.test(char)) {
+              nextState = 'q2';
+              hasUpper = true;
+            } else if (/[0-9]/.test(char)) {
+              nextState = 'q3';
+              hasDigit = true;
+            } else if (/[@$!%*?&]/.test(char)) {
+              nextState = 'q4';
+              hasSymbol = true;
+            }
+            break;
+          case 'q1':
+          case 'q2':
+          case 'q3':
+          case 'q4':
+          case 'q5':
+            if (/[a-z]/.test(char)) {
+              nextState = 'q5';
+              hasLower = true;
+            } else if (/[A-Z]/.test(char)) {
+              nextState = 'q5';
+              hasUpper = true;
+            } else if (/[0-9]/.test(char)) {
+              nextState = 'q5';
+              hasDigit = true;
+            } else if (/[@$!%*?&]/.test(char)) {
+              nextState = 'q5';
+              hasSymbol = true;
+            }
+            break;
+          case 'q_error':
+            nextState = 'q_error';
+            break;
+        }
+
+        currentState = nextState;
+      }
+
+      const isValid = currentState !== 'q_error' &&
+                      input.length >= 8 &&
+                      hasLower &&
+                      hasUpper &&
+                      hasDigit &&
+                      hasSymbol;
+
+      if (isValid) {
+        resultDiv.textContent = `Password benar: ${input}`;
+        resultDiv.className = 'result valid';
+      } else {
+        resultDiv.textContent = `Password salah: ${input}`;
+        resultDiv.className = 'result invalid';
+      }
+    }
+
+    // Password Meter
+    function updatePasswordMeter() {
+      const input = document.getElementById('passwordInput').value;
+      const meterBar = document.getElementById('passwordMeterBar');
+      let score = 0;
+
+      if (input.length >= 8) score += 20;
+      if (/[a-z]/.test(input)) score += 20;
+      if (/[A-Z]/.test(input)) score += 20;
+      if (/[0-9]/.test(input)) score += 20;
+      if (/[@$!%*?&]/.test(input)) score += 20;
+
+      meterBar.style.width = `${score}%`;
+
+      if (score <= 40) {
+        meterBar.style.backgroundColor = '#dc3545';
+      } else if (score <= 60) {
+        meterBar.style.backgroundColor = '#ffc107';
+      } else {
+        meterBar.style.backgroundColor = '#28a745';
+      }
+    }
+
+    // Toggle Password Visibility
+    function togglePassword() {
+      const passwordInput = document.getElementById('passwordInput');
+      const toggleButton = document.querySelector('button[onclick="togglePassword()"]');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleButton.textContent = 'Hide Password';
+      } else {
+        passwordInput.type = 'password';
+        toggleButton.textContent = 'Show Password';
+      }
+    }
+
+    // Reset
     function reset() {
       document.getElementById('emailInput').value = '';
       document.getElementById('emailResult').textContent = '';
       document.getElementById('emailResult').className = 'result';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordResult').textContent = '';
+      document.getElementById('passwordResult').className = 'result';
+      document.getElementById('passwordMeterBar').style.width = '0%';
+      document.getElementById('passwordMeterBar').style.backgroundColor = '#ddd';
+      const toggleButton = document.querySelector('button[onclick="togglePassword()"]');
+      document.getElementById('passwordInput').type = 'password';
+      toggleButton.textContent = 'Show Password';
     }
   </script>
 </body>
