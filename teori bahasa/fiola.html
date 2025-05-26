@@ -104,7 +104,7 @@
 
     <div class="input-section">
       <label for="passwordInput">Masukkan Password:</label><br>
-      <input type="password" id="passwordInput" placeholder="contoh: Pass123!" oninput="updatePasswordMeter()"><br>
+      <input type="password" id="passwordInput" placeholder="contoh: Pass_123!" oninput="updatePasswordMeter()"><br>
       <div class="password-meter">
         <div class="password-meter-bar" id="passwordMeterBar"></div>
       </div>
@@ -234,10 +234,16 @@
       let hasUpper = false;
       let hasDigit = false;
       let hasSymbol = false;
+      let hasInvalidChar = false;
 
       for (let i = 0; i < input.length; i++) {
         const char = input[i];
         let nextState = 'q_error';
+
+        if (!/[a-zA-Z0-9@$!%*?&_]/.test(char)) {
+          hasInvalidChar = true;
+          break;
+        }
 
         switch (currentState) {
           case 'q0':
@@ -250,7 +256,7 @@
             } else if (/[0-9]/.test(char)) {
               nextState = 'q3';
               hasDigit = true;
-            } else if (/[@$!%*?&]/.test(char)) {
+            } else if (/[@$!%*?&_]/.test(char)) {
               nextState = 'q4';
               hasSymbol = true;
             }
@@ -269,7 +275,7 @@
             } else if (/[0-9]/.test(char)) {
               nextState = 'q5';
               hasDigit = true;
-            } else if (/[@$!%*?&]/.test(char)) {
+            } else if (/[@$!%*?&_]/.test(char)) {
               nextState = 'q5';
               hasSymbol = true;
             }
@@ -282,18 +288,25 @@
         currentState = nextState;
       }
 
-      const isValid = input.length >= 8 &&
-                      hasLower &&
-                      hasUpper &&
-                      hasDigit &&
-                      hasSymbol;
+      if (hasInvalidChar) {
+        resultDiv.textContent = `Password tidak valid: Mengandung karakter tidak diizinkan (hanya huruf, angka, dan @$!%*?&_).`;
+        resultDiv.className = 'result invalid';
+        return;
+      }
 
-      if (isValid) {
+      const errors = [];
+      if (input.length < 8) errors.push("kurang panjang (minimal 8 karakter)");
+      if (!hasLower) errors.push("tidak mengandung huruf kecil");
+      if (!hasUpper) errors.push("tidak mengandung huruf besar");
+      if (!hasDigit) errors.push("tidak mengandung angka");
+      if (!hasSymbol) errors.push("tidak mengandung simbol khusus (@$!%*?&_)");
+
+      if (errors.length > 0) {
+        resultDiv.textContent = `Password tidak valid: ${errors.join(", ")}.`;
+        resultDiv.className = 'result invalid';
+      } else {
         resultDiv.textContent = `Password benar: ${input}`;
         resultDiv.className = 'result valid';
-      } else {
-        resultDiv.textContent = `Password salah: ${input}`;
-        resultDiv.className = 'result invalid';
       }
     }
 
