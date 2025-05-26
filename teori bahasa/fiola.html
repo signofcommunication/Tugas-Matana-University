@@ -307,7 +307,7 @@
       if (/[a-z]/.test(input)) score += 20;
       if (/[A-Z]/.test(input)) score += 20;
       if (/[0-9]/.test(input)) score += 20;
-      if (/[@$!%*?&]/.test(input)) score += 20;
+      if (/[@$!%*?&_]/.test(input)) score += 20;
 
       meterBar.style.width = `${score}%`;
 
