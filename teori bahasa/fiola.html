@@ -282,8 +282,7 @@
         currentState = nextState;
       }
 
-      const isValid = currentState !== 'q_error' &&
-                      input.length >= 8 &&
+      const isValid = input.length >= 8 &&
                       hasLower &&
                       hasUpper &&
                       hasDigit &&
