@@ -1,55 +1,48 @@
 def validate_plate(plate):
-    state = 0
+    state = {0}  
     plate = plate.strip()
     num_digits = 0
     num_end_letters = 0
     
     for char in plate:
-        if state == 0:
-            if char.isalpha() and char.isupper():
-                state = 1
-            else:
-                return False
-        elif state == 1:
-            if char.isalpha() and char.isupper():
-                state = 2
-            elif char == ' ':
-                state = 3
-            else:
-                return False
-        elif state == 2:
-            if char == ' ':
-                state = 3
-            else:
-                return False
-        elif state == 3:
-            if char.isdigit():
-                num_digits += 1
-                state = 4
-            else:
-                return False
-        elif state == 4:
-            if char.isdigit() and num_digits < 4:
-                num_digits += 1
-                state = 4
-            elif char == ' ' and num_digits >= 1:
-                state = 5
-            else:
-                return False
-        elif state == 5:
-            if char.isalpha() and char.isupper():
-                num_end_letters += 1
-                state = 6
-            else:
-                return False
-        elif state == 6:
-            if char.isalpha() and char.isupper() and num_end_letters < 3:
-                num_end_letters += 1
-                state = 6
-            else:
-                return False
+        next_state = set()
+        for s in state:
+            if s == 0:
+                if char.isalpha() and char.isupper():
+                    next_state.add(1)
+            elif s == 1:
+                if char.isalpha() and char.isupper():
+                    next_state.add(1)  
+                    next_state.add(2)
+                if char == ' ':
+                    next_state.add(2)
+                next_state.add(2)
+            elif s == 2:
+                if char == ' ':
+                    next_state.add(3)
+            elif s == 3:
+                if char.isdigit():
+                    num_digits += 1
+                    next_state.add(4)
+            elif s == 4:
+                if char.isdigit() and num_digits < 4:
+                    num_digits += 1
+                    next_state.add(4)
+                    next_state.add(5)
+                if char == ' ' and num_digits >= 1:
+                    next_state.add(5)
+                if num_digits >= 1:
+                    next_state.add(5)
+            elif s == 5:
+                if char.isalpha() and char.isupper() and num_end_letters < 3:
+                    num_end_letters += 1
+                    next_state.add(5)
+        
+        state = next_state
+        if not state:
+            return False
     
-    return state == 6 and 5 <= len(plate) <= 10 and num_digits >= 1 and num_end_letters >= 1
+    return 5 in state and 5 <= len(plate) <= 11 and num_digits >= 1 and num_end_letters >= 1
 
 def main():
     while True:
