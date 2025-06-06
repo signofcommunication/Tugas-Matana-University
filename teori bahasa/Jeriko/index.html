@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulasi DFA Sistem Pengapian Mesin Motor</title>
+    <title>Simulasi Sistem Pengapian Mesin Motor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,6 +66,16 @@
             max-height: 200px;
             overflow-y: auto;
         }
+        #errorMessage {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            display: none;
+            text-align: center;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -89,12 +99,14 @@
             <option value="Start">Start</option>
             <option value="Gas">Gas</option>
             <option value="Stop">Stop</option>
+            <option value="Rem">Rem</option>
         </select>
         <button onclick="addInput()">Tambah Input</button>
         <button onclick="runSimulation()">Jalankan Simulasi</button>
         <button onclick="loadHistory()">Muat History</button>
         <div id="inputList">Urutan input: []</div>
         <div id="output">Hasil simulasi akan muncul di sini...</div>
+        <div id="errorMessage"></div>
         <div id="history">
             <h3>History Simulasi</h3>
             <table>
@@ -114,29 +126,51 @@
     <script>
         // Definisi DFA untuk sistem pengapian mesin motor
         const dfa = {
-            states: ['Mati', 'Idle', 'Berjalan'],
-            inputs: ['Start', 'Gas', 'Stop'],
+            states: ['Mati', 'Idle', 'Berjalan', 'Rem'],
+            inputs: ['Start', 'Gas', 'Stop', 'Rem'],
             initialState: 'Mati',
             finalStates: ['Mati'],
             transitions: {
                 'Mati': { 'Start': 'Idle' },
                 'Idle': { 'Gas': 'Berjalan', 'Stop': 'Mati' },
-                'Berjalan': { 'Stop': 'Mati' }
+                'Berjalan': { 'Stop': 'Mati', 'Rem': 'Rem' },
+                'Rem': { 'Gas': 'Berjalan', 'Stop': 'Mati' }
             }
         };
 
         let inputSequence = [];
 
+        // Fungsi untuk menampilkan pesan error
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerText = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
         // Fungsi untuk menambah input ke urutan
         function addInput() {
             const select = document.getElementById('inputSelect');
             const input = select.value;
+            // Validasi input
+            if (!dfa.inputs.includes(input)) {
+                showError('Input tidak dikenali! Hanya Start, Gas, Stop, atau Rem yang diperbolehkan.');
+                return;
+            }
             inputSequence.push(input);
             document.getElementById('inputList').innerText = `Urutan input: [${inputSequence.join(', ')}]`;
         }
 
         // Fungsi untuk menjalankan simulasi DFA
         async function runSimulation() {
+            // Validasi inputSequence kosong
+            if (inputSequence.length === 0) {
+                showError('Urutan input kosong! Tambahkan input terlebih dahulu.');
+                return;
+            }
+
             let currentState = dfa.initialState;
             let output = `State awal: ${currentState}<br>`;
             let isValid = true;
@@ -146,36 +180,59 @@
                     currentState = dfa.transitions[currentState][input];
                     output += `Input: ${input} -> Transisi ke state: ${currentState}<br>`;
                 } else {
-                    output += `Input: ${input} -> Tidak valid untuk state ${currentState}!<br>`;
+                    let reason = '';
+                    if (!dfa.inputs.includes(input)) {
+                        reason = `Input "${input}" tidak dikenali. Hanya Start, Gas, Stop, atau Rem yang diperbolehkan.`;
+                    } else if (!dfa.transitions[currentState]) {
+                        reason = `Tidak ada transisi yang didefinisikan untuk state ${currentState}.`;
+                    } else {
+                        reason = `Input "${input}" tidak valid di state ${currentState}. `;
+                        if (currentState === 'Mati') {
+                            reason += 'Mesin belum dinyalakan, hanya Start yang diperbolehkan.';
+                        } else if (currentState === 'Idle') {
+                            reason += 'Mesin idle, hanya Gas atau Stop yang diperbolehkan.';
+                        } else if (currentState === 'Berjalan') {
+                            reason += 'Mesin sedang berjalan, hanya Stop atau Rem yang diperbolehkan.';
+                        } else if (currentState === 'Rem') {
+                            reason += 'Mesin dalam mode rem, hanya Gas atau Stop yang diperbolehkan.';
+                        }
+                    }
+                    output += `Error: ${reason}<br>`;
+                    showError(reason);
                     isValid = false;
                     break;
                 }
             }
 
-            const isAccepted = dfa.finalStates.includes(currentState);
-            output += `State akhir: ${currentState}<br>`;
-            output += `Diterima? ${isAccepted ? 'Ya' : 'Tidak'}`;
-            document.getElementById('output').innerHTML = output;
+            if (isValid) {
+                const isAccepted = dfa.finalStates.includes(currentState);
+                output += `State akhir: ${currentState}<br>`;
+                output += `Diterima? ${isAccepted ? 'Ya' : 'Tidak'}`;
+                document.getElementById('output').innerHTML = output;
 
-            // Simpan simulasi ke database
-            try {
-                const response = await fetch('http://localhost:3000/api/simulation', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        input_sequence: inputSequence.join(','),
-                        final_state: currentState,
-                        is_accepted: isAccepted
-                    })
-                });
-                if (response.ok) {
+                // Simpan simulasi ke database
+                try {
+                    const response = await fetch('http://localhost:3000/api/simulation', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            input_sequence: inputSequence.join(','),
+                            final_state: currentState,
+                            is_accepted: isAccepted
+                        })
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: Gagal menyimpan simulasi.`);
+                    }
                     console.log('Simulasi disimpan');
-                    loadHistory(); // Perbarui history setelah menyimpan
-                } else {
-                    console.error('Gagal menyimpan simulasi');
+                    loadHistory();
+                } catch (err) {
+                    const reason = `Gagal menyimpan ke database: ${err.message}. Periksa koneksi atau server.`;
+                    showError(reason);
+                    console.error('Error:', err);
                 }
-            } catch (err) {
-                console.error('Error:', err);
+            } else {
+                document.getElementById('output').innerHTML = output;
             }
 
             // Reset input setelah simulasi
@@ -187,25 +244,35 @@
         async function loadHistory() {
             try {
                 const response = await fetch('http://localhost:3000/api/simulation/history');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: Gagal mengambil history.`);
+                }
                 const history = await response.json();
                 const tbody = document.getElementById('historyTable');
                 tbody.innerHTML = '';
-                history.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${new Date(item.created_at).toLocaleString()}</td>
-                        <td>${item.input_sequence}</td>
-                        <td>${item.final_state}</td>
-                        <td>${item.is_accepted ? 'Ya' : 'Tidak'}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
+                if (history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">Belum ada history simulasi.</td></tr>';
+                } else {
+                    history.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${new Date(item.created_at).toLocaleString()}</td>
+                            <td>${item.input_sequence}</td>
+                            <td>${item.final_state}</td>
+                            <td>${item.is_accepted ? 'Ya' : 'Tidak'}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
             } catch (err) {
+                const reason = `Gagal memuat history: ${err.message}. Periksa koneksi atau server.`;
+                showError(reason);
                 console.error('Error memuat history:', err);
                 document.getElementById('historyTable').innerHTML = '<tr><td colspan="4">Gagal memuat history</td></tr>';
             }
         }
 
+        // Muat history saat halaman dimuat
         loadHistory();
     </script>
 </body>
