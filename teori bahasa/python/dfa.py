@@ -1,6 +1,13 @@
 def validate_plate(plate):
     plate = plate.strip()
-    states = {(0, 0, 0, 0)} 
+
+    for c in plate:
+        if c.isdigit():
+            if c == '0':
+                return False
+            break
+
+    states = {(0, 0, 0, 0)}
 
     for char in plate:
         next_states = set()
